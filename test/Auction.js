@@ -14,7 +14,7 @@ describe("Auction", function () {
     const [owner, otherAccount1, otherAccount2, _] = await ethers.getSigners();
 
     const Auction = await ethers.getContractFactory("Auction");
-    const auction = await Auction.deploy("0x345565c62EFB2859769b6Ee887577123C550a6Ff", 100);
+    const auction = await Auction.deploy("0x978A328Cc24C0b50a0D9F97787938E67CF09F9A9", 100);
 
     return { auction, owner, otherAccount1, otherAccount2 };
   }
