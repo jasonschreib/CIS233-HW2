@@ -58,7 +58,7 @@ contract Auction {
 
     function endAuction() public /* MODIFIER(S) */ {
         /* 
-            End the auction by setting the startTime variable
+            End the auction by setting the endTime variable
             Permissions - only the owner should be allowed to end the auction.
          */
     }
