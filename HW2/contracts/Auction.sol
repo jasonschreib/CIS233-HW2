@@ -48,7 +48,7 @@ contract Auction {
         _;
     }
 
-    function startAuction() public /* MODIFIER(S) */ {
+    function startAuction() public /* MODIFIER(S) */onlyOwner {
         /* 
             Start the auction by setting the startTime variable
             Permissions - only the owner should be allowed to start the auction.
@@ -56,14 +56,14 @@ contract Auction {
 
     }
 
-    function endAuction() public /* MODIFIER(S) */ {
+    function endAuction() public /* MODIFIER(S) */ onlyOwner isClosed{
         /* 
             End the auction by setting the startTime variable
             Permissions - only the owner should be allowed to end the auction.
          */
     }
 
-    function makeBid() public payable /* MODIFIER(S) */ {
+    function makeBid() public payable /* MODIFIER(S) */ isActive{
         /* 
             Only allow the bid to go through if it is higher than the current highest bid and the bidder has not yet bid.
             Set the highestBidder, and highestBid variables accordingly.
@@ -73,7 +73,7 @@ contract Auction {
 
     }
 
-    function upBid() public payable /* MODIFIERS(S) */ {
+    function upBid() public payable /* MODIFIERS(S) */ isActive{
         /* 
             upBid will update the bidder's bid to their current bid + the msg.value being added.
             Only allow the upBid to go through if their new bid price is higher than the current bid and they have already bid. 
@@ -86,7 +86,7 @@ contract Auction {
 
     }
 
-    function refund() public /* MODIFIER(S) */ {
+    function refund() public /* MODIFIER(S) */ isClosed{
         /* 
             For the refunds, the loser will individually call this function.
             Refunds won't be made to all losers in a batch. You will see in Part 3 why that is a bad design pattern.
@@ -103,7 +103,7 @@ contract Auction {
 
     }
 
-    function payoutWinner() public /* MODIFIER(S) */ {
+    function payoutWinner() public /* MODIFIER(S) */ isClosed{
         fundsPerBidder[highestBidder] = 0;
         nft.enterAddressIntoBook("auction");
         nft.mintNFT();
