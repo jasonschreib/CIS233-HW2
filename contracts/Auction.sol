@@ -56,11 +56,12 @@ contract Auction {
         startTime = block.timestamp;
     }
 
-    function endAuction() public /* MODIFIER(S) */ onlyOwner isClosed{
+    function endAuction() public /* MODIFIER(S) */ onlyOwner{
         /* 
             End the auction by setting the startTime variable
             Permissions - only the owner should be allowed to end the auction.
          */
+        endTime = startTime + 5000;
     }
 
     function makeBid() public payable /* MODIFIER(S) */ isActive{
@@ -70,7 +71,21 @@ contract Auction {
             
             Update the fundsPerBidder map.
          */
+        //require the current bid is greater than 0 and greater than current highest bid
+        require(msg.value > highestBid, "value < highest");
 
+        //if the bidder does not have a default value of 0 (meaning haven't bid yet)
+        if (address(msg.sender) != address(0)) {
+                //set highestBidder
+                highestBidder = payable(msg.sender);
+                //set highestBid
+                highestBid = msg.value;
+                //update fundsPerBidder
+                fundsPerBidder[highestBidder] += highestBid;
+        }
+        else {
+            revert();
+        }
     }
 
     function upBid() public payable /* MODIFIERS(S) */ isActive{
@@ -83,7 +98,14 @@ contract Auction {
             Update the fundsPerBidder map.
 
         */
+        require(msg.value > highestBid, "value < highest");
 
+        if (msg.value > highestBid) {
+            highestBidder = payable(msg.sender);
+            highestBid = msg.value;
+        }
+        //update the fundsPerBidder map by increasing the bid for the new highestBidder
+            fundsPerBidder[highestBidder] += highestBid;
     }
 
     function refund() public /* MODIFIER(S) */ isClosed{
@@ -100,10 +122,10 @@ contract Auction {
             Hint 1: You only need a reciever's public key to send them ETH. 
             Hint 2: Use the solidity transfer function to send the funds. 
         */
-
+        require(block.timestamp < endTime, "ended");
     }
 
-    function payoutWinner() public /* MODIFIER(S) */ isClosed{
+    function payoutWinner() public /* MODIFIER(S) */ onlyOwner isClosed{
         fundsPerBidder[highestBidder] = 0;
         nft.enterAddressIntoBook("auction");
         nft.mintNFT();
