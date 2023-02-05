@@ -53,7 +53,7 @@ contract Auction {
             Start the auction by setting the startTime variable
             Permissions - only the owner should be allowed to start the auction.
          */
-
+        startTime = block.timestamp;
     }
 
     function endAuction() public /* MODIFIER(S) */ onlyOwner isClosed{
