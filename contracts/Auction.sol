@@ -61,7 +61,7 @@ contract Auction {
             End the auction by setting the startTime variable
             Permissions - only the owner should be allowed to end the auction.
          */
-        endTime = startTime + 1 days;
+        endTime = block.timestamp;
     }
 
     function makeBid() public payable /* MODIFIER(S) */ isActive{
@@ -126,10 +126,17 @@ contract Auction {
         */
         //if the current address is not the highestBidder
         if (address(msg.sender) != address(highestBidder)) {
-            //Use the solidity transfer function to send the corresponding funds with receiver's public key
-            payable(msg.sender).transfer(fundsPerBidder[msg.sender]);
-            //update the fundsPerBidder mapping by setting current bidder's funds to 0
-            fundsPerBidder[msg.sender] = 0;
+            //if the funds are not equal to zero for this bidder - meaning they haven't already withdrawn
+            if (fundsPerBidder[msg.sender] != 0) {
+                //Use the solidity transfer function to send the corresponding funds with receiver's public key
+                payable(msg.sender).transfer(fundsPerBidder[msg.sender]);
+                //update the fundsPerBidder mapping by setting current bidder's funds to 0
+                fundsPerBidder[msg.sender] = 0;
+            } else {
+                revert();
+            }
+        } else {
+            revert();
         }
     }
 
