@@ -82,8 +82,7 @@ contract Auction {
                 highestBid = msg.value;
                 //update fundsPerBidder
                 fundsPerBidder[highestBidder] += highestBid;
-        }
-        else {
+        } else {
             revert();
         }
     }
@@ -96,14 +95,19 @@ contract Auction {
             Set the highestBidder, and highestBid variables accordingly.
             
             Update the fundsPerBidder map.
-
         */
-        require(msg.value > highestBid, "value < highest");
+        require(msg.value + fundsPerBidder[msg.sender] > highestBid, "value < highest");
 
-        highestBidder = payable(msg.sender);
-        highestBid = msg.value;
-        //update the fundsPerBidder map by increasing the bid for the new highestBidder
-        fundsPerBidder[highestBidder] += highestBid;
+        //if the bidder has already bid --> their funds are greater than 0
+        if (fundsPerBidder[msg.sender] != 0) {
+            //Set the highestBidder, and highestBid variables accordingly
+            highestBidder = payable(msg.sender);
+            highestBid = msg.value;
+            //update the fundsPerBidder map by increasing the bid for the new highestBidder
+            fundsPerBidder[highestBidder] += highestBid;
+        } else { //otherwise revert
+            revert();
+        }
     }
 
     function refund() public /* MODIFIER(S) */ isClosed{
