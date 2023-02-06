@@ -56,7 +56,7 @@ contract Auction {
         startTime = block.timestamp;
     }
 
-    function endAuction() public /* MODIFIER(S) */ onlyOwner{
+    function endAuction() public /* MODIFIER(S) */ onlyOwner isActive{
         /* 
             End the auction by setting the startTime variable
             Permissions - only the owner should be allowed to end the auction.
