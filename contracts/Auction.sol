@@ -61,7 +61,7 @@ contract Auction {
             End the auction by setting the startTime variable
             Permissions - only the owner should be allowed to end the auction.
          */
-        endTime = startTime + 5000;
+        endTime = startTime + 1 days;
     }
 
     function makeBid() public payable /* MODIFIER(S) */ isActive{
@@ -74,8 +74,8 @@ contract Auction {
         //require the current bid is greater than 0 and greater than current highest bid
         require(msg.value > highestBid, "value < highest");
 
-        //if the bidder does not have a default value of 0 (meaning haven't bid yet)
-        if (address(msg.sender) != address(0)) {
+        //if the bidder has a default fund value of 0 (meaning haven't bid yet)
+        if (fundsPerBidder[msg.sender] == 0) {
                 //set highestBidder
                 highestBidder = payable(msg.sender);
                 //set highestBid
@@ -100,12 +100,10 @@ contract Auction {
         */
         require(msg.value > highestBid, "value < highest");
 
-        if (msg.value > highestBid) {
-            highestBidder = payable(msg.sender);
-            highestBid = msg.value;
-        }
+        highestBidder = payable(msg.sender);
+        highestBid = msg.value;
         //update the fundsPerBidder map by increasing the bid for the new highestBidder
-            fundsPerBidder[highestBidder] += highestBid;
+        fundsPerBidder[highestBidder] += highestBid;
     }
 
     function refund() public /* MODIFIER(S) */ isClosed{
@@ -120,9 +118,15 @@ contract Auction {
             Update the fundsPerBidder mapping and transfer the refund to the bidder.
             
             Hint 1: You only need a reciever's public key to send them ETH. 
-            Hint 2: Use the solidity transfer function to send the funds. 
+            Hint 2: Use the solidity transfer function to send the funds.
         */
-        require(block.timestamp < endTime, "ended");
+        //if the current address is not the highestBidder
+        if (address(msg.sender) != address(highestBidder)) {
+            //Use the solidity transfer function to send the corresponding funds with receiver's public key
+            payable(msg.sender).transfer(fundsPerBidder[msg.sender]);
+            //update the fundsPerBidder mapping by setting current bidder's funds to 0
+            fundsPerBidder[msg.sender] = 0;
+        }
     }
 
     function payoutWinner() public /* MODIFIER(S) */ onlyOwner isClosed{
